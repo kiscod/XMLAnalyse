@@ -105,7 +105,7 @@ public class DOMTest {
 
         Element book = document.createElement("book");
         book.setAttribute("id", "1");
-        
+
         Element name = document.createElement("name");
         name.setTextContent("小王子");
         Element author = document.createElement("author");
