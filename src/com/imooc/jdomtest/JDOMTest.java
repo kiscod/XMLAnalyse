@@ -1,15 +1,13 @@
 package com.imooc.jdomtest;
 
+import com.imooc.entity.Book;
 import org.jdom2.Attribute;
 import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.List;
 
 /**
@@ -26,15 +24,18 @@ public class JDOMTest {
         SAXBuilder saxBuilder = new SAXBuilder();
         //创建一个输入流 以加载xml
         InputStream in;
+
         try {
             in = new FileInputStream("demo" + java.io.File.separator + "books.xml");
-            Document document = saxBuilder.build(in);
+//            InputStreamReader isr = new InputStreamReader(in, "UTF-8");
+            Document document = saxBuilder.build(in);   // in ->  isr
             //获取根节点
             Element rootElement = document.getRootElement();
             //获取子节点的集合
             List<Element> bookList = rootElement.getChildren();
 
             for (Element book : bookList) {
+                Book bookEntity = new Book();
                 System.out.println("===开始解析第" + (bookList.indexOf(book) + 1) + "本书===");
 
                 //解析book的属性
@@ -43,12 +44,24 @@ public class JDOMTest {
                 for (Attribute attr : attrList) {
                     System.out.println(attr.getName());
                     System.out.println(attr.getValue());
+                    if("id".equals(attr.getName())){
+                        bookEntity.setId(attr.getValue());
+                    }
                 }
 
                 List<Element> bookChilds = book.getChildren();
                 for (Element child : bookChilds) {
                     System.out.println("节点" + child.getName() + "的值为" + child.getValue());
+                    bookEntity.setValue(child.getName(), child.getValue());
                 }
+//
+//                //对book的子节点及节点值遍历
+//                for (Element child : book.getChildren()) {
+//                    System.out.println("节点 " + child.getName() + " 的值为 " + child.getValue());
+//                }
+
+                System.out.println(bookEntity.toString());
+
 
                 System.out.println("===结束解析第" + (bookList.indexOf(book) + 1) + "本书===");
             }

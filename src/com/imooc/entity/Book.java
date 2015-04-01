@@ -1,5 +1,8 @@
 package com.imooc.entity;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+
 /**
  * Created with IntelliJ IDEA.
  * User: QiuShiLe
@@ -34,6 +37,28 @@ public class Book {
                 ( "".equals(price)       ? "" : ", price='"      + price    + '\'') +
                 ( "".equals(language)    ? "" : ", language='"   + language + '\'') +
                 '}';
+    }
+
+    public void setValue(String name, String value) {
+        Class tempBook = this.getClass();
+        Method[] ms = tempBook.getMethods();
+        String tempName;
+        for (Method method : ms) {
+            tempName = method.getName();
+            if(("set" + name).toLowerCase().equals(tempName.toLowerCase())){
+                Method m = null;
+                try {
+                    m = tempBook.getMethod(tempName, String.class);
+                    final Object invoke = m.invoke(this, value);
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 
     public String getId() {

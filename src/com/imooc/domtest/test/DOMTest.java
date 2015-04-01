@@ -5,6 +5,10 @@ import org.xml.sax.SAXException;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.*;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -16,16 +20,30 @@ import java.io.IOException;
  * 我们年轻的时候，总是把创作的冲动误以为是创作的才华; 总是把对孤独的恐惧误以为是对爱情的向往。
  */
 public class DOMTest {
-    public static void main(String[] args) {
+
+
+    public DocumentBuilder getDocumentBuilder(){
+        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+        DocumentBuilder db = null;  //创建一个DxBx对象
+        try {
+            db = dbf.newDocumentBuilder();
+        } catch (ParserConfigurationException e) {
+            e.printStackTrace();
+        }
+        return db;
+    }
+
+    /**
+     * 解析XML
+     */
+    public void xmlParser() {
 
         String demoFileName = "demo" + java.io.File.separator + "books.xml";
 
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             //创建DocumentBuilder对象
-            DocumentBuilder db = dbf.newDocumentBuilder();  //创建一个DxBx对象
             //通过DocumentBuilder对象的parse方法加载books.xml文件
-            Document document = db.parse(demoFileName);
+            Document document = getDocumentBuilder().parse(demoFileName);
             //获取所有book节点的集合
             NodeList bookList = document.getElementsByTagName("book");
             //通过bookList的getLength方法可以获取bookList的长度
@@ -69,14 +87,58 @@ public class DOMTest {
 
                 System.out.println("=======结束遍历" + (i+1) + "本书的内容=======");
             }
-
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
 
+    /**
+     * 生成XML
+     */
+    public void createXML(){
+        DocumentBuilder db = getDocumentBuilder();
+        Document document = db.newDocument();
+        document.setXmlStandalone(true);
+        Element bookStore = document.createElement("bookStore");
+
+        Element book = document.createElement("book");
+        book.setAttribute("id", "1");
+        
+        Element name = document.createElement("name");
+        name.setTextContent("小王子");
+        Element author = document.createElement("author");
+        author.setTextContent("Cliton");
+        Element year = document.createElement("year");
+        year.setTextContent("1999");
+
+        book.appendChild(name);
+        book.appendChild(author);
+        book.appendChild(year);
+
+
+
+        bookStore.appendChild(book);
+
+        document.appendChild(bookStore);
+
+        TransformerFactory tf = TransformerFactory.newInstance();
+        try {
+            Transformer transformer = tf.newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+            transformer.transform(new DOMSource(document), new StreamResult(
+                    new File("demo" + java.io.File.separator + "books1.xml")));
+        } catch (TransformerConfigurationException e) {
+            e.printStackTrace();
+        } catch (TransformerException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        DOMTest test = new DOMTest();
+//        test.xmlParser();
+        test.createXML();
     }
 }
