@@ -40,6 +40,9 @@ public class Book {
     }
 
     public void setValue(String name, String value) {
+        if("value".equals(name.toLowerCase())){
+            return;
+        }
         Class tempBook = this.getClass();
         Method[] ms = tempBook.getMethods();
         String tempName;
@@ -50,6 +53,7 @@ public class Book {
                 try {
                     m = tempBook.getMethod(tempName, String.class);
                     final Object invoke = m.invoke(this, value);
+
                 } catch (IllegalAccessException e) {
                     e.printStackTrace();
                 } catch (InvocationTargetException e) {
